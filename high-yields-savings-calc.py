@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-def calculate_end_of_year_balance(deposit_per_period, annual_yield=0.044, initial_balance=2594):
+def calculate_monthly_interest(deposit_per_period, annual_yield=0.044, initial_balance=2594):
     today_date = datetime.now()
     end_of_year = datetime(today_date.year, 12, 31)
     payday_weekday = 2  # Assuming payday is Wednesday
@@ -12,33 +12,42 @@ def calculate_end_of_year_balance(deposit_per_period, annual_yield=0.044, initia
         days_until_next_payday = 7
     next_payday = today_date + timedelta(days=days_until_next_payday)
 
-    # Calculate remaining pay periods
+    # Calculate remaining pay periods and months
     remaining_weeks_this_year = (end_of_year - next_payday).days / 7
     remaining_pay_periods = remaining_weeks_this_year // 2
+    months_remaining = int((end_of_year - today_date).days / 30)  # Approximate months remaining
 
-    # Adjust total deposits for the remaining pay periods
-    adjusted_total_deposits = deposit_per_period * remaining_pay_periods
+    # Monthly interest rate
+    monthly_interest_rate = annual_yield / 12
 
-    # Adjusted new balance before interest
-    new_balance_before_interest_adjusted = initial_balance + adjusted_total_deposits
+    # Initialize balance and monthly interest list
+    balance = initial_balance
+    monthly_interest_earnings = []
 
-    # Adjusted interest for the remaining months
-    months_remaining = (end_of_year - today_date).days / 30  # Approximate months remaining
-    adjusted_annual_yield = annual_yield * (months_remaining / 12)
-    adjusted_interest_earned = new_balance_before_interest_adjusted * adjusted_annual_yield
+    for month in range(months_remaining):
+        # Add deposit at the start of the month for remaining pay periods
+        if month < remaining_pay_periods * 2:
+            balance += deposit_per_period
+        # Calculate interest for the month
+        interest_for_month = balance * monthly_interest_rate
+        monthly_interest_earnings.append(interest_for_month)
+        # Update balance with interest
+        balance += interest_for_month
 
-    # Final adjusted balance
-    adjusted_final_balance = new_balance_before_interest_adjusted + adjusted_interest_earned
-    return adjusted_final_balance
+    # Final balance at the end of the year
+    final_balance = balance
+    return final_balance, monthly_interest_earnings
 
 # Streamlit UI
 st.title('End of Year Savings Calculator')
 
 deposit_per_period = st.number_input("Enter your deposit amount per pay period:", value=244)
-# Updated to use a slider for annual yield
 annual_yield = st.number_input("Select the annual yield of your savings account (as a percentage):", value=4.4) / 100
 initial_balance = st.number_input("Enter your current savings balance:", value=2594)
 
 if st.button('Calculate'):
-    result = calculate_end_of_year_balance(deposit_per_period, annual_yield, initial_balance)
-    st.write(f"Estimated balance by the end of the year: ${result:.2f}")
+    final_balance, monthly_interest_earnings = calculate_monthly_interest(deposit_per_period, annual_yield, initial_balance)
+    st.write(f"Estimated balance by the end of the year: ${final_balance:.2f}")
+    st.write("Monthly interest earnings:")
+    for month, interest in enumerate(monthly_interest_earnings, start=1):
+        st.write(f"Month {month}: ${interest:.2f}")
