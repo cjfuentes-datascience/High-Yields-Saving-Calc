@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime, timedelta
+import calendar
 
 def calculate_monthly_interest(deposit_per_period, annual_yield=0.044, initial_balance=2594):
     today_date = datetime.now()
@@ -48,6 +49,14 @@ initial_balance = st.number_input("Enter your current savings balance:", value=2
 if st.button('Calculate'):
     final_balance, monthly_interest_earnings = calculate_monthly_interest(deposit_per_period, annual_yield, initial_balance)
     st.write(f"Estimated balance by the end of the year: ${final_balance:.2f}")
+    
+    # Get the current month and year
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    
     st.write("Monthly interest earnings:")
-    for month, interest in enumerate(monthly_interest_earnings, start=1):
-        st.write(f"Month {month}: ${interest:.2f}")
+    for i, interest in enumerate(monthly_interest_earnings, start=1):
+        # Calculate month name
+        month_name = calendar.month_name[(current_month + i - 1) % 12 or 12]  # Correct for zero-index and loop around
+        # Display interest with actual month names
+        st.write(f"{month_name}: ${interest:.2f}")
