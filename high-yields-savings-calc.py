@@ -41,7 +41,7 @@ def calculate_monthly_interest(deposit_per_period, annual_yield=0.044, initial_b
 st.title('End of Year Savings Calculator')
 
 deposit_per_period = st.number_input("Enter your deposit amount per pay period:", value=244)
-annual_yield = st.slider("Select the annual yield of your savings account (as a percentage):", min_value=0.0, max_value=10.0, value=4.4) / 100
+annual_yield = st.number_input("Select the annual yield of your savings account (as a percentage):", value=4.4) / 100
 initial_balance = st.number_input("Enter your current savings balance:", value=2594)
 
 if st.button('Calculate'):
