@@ -55,8 +55,11 @@ if st.button('Calculate'):
     current_year = datetime.now().year
     
     st.write("Monthly interest earnings:")
+    bullet_points = ""
     for i, interest in enumerate(monthly_interest_earnings, start=1):
         # Calculate month name
         month_name = calendar.month_name[(current_month + i - 1) % 12 or 12]  # Correct for zero-index and loop around
-        # Display interest with actual month names
-        st.write(f"{month_name}: ${interest:.2f}")
+        # Append each month's interest earnings as bullet points
+        bullet_points += f"* {month_name}: ${interest:.2f}\n"
+    # Display bullet points using Markdown
+    st.markdown(bullet_points)
