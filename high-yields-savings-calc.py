@@ -1,6 +1,6 @@
-import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import calendar
+import streamlit as st
 
 def calculate_monthly_interest(deposit_per_period, annual_yield=0.044, initial_balance=2594):
     today_date = datetime.now()
@@ -49,17 +49,16 @@ initial_balance = st.number_input("Enter your current savings balance:", value=2
 if st.button('Calculate'):
     final_balance, monthly_interest_earnings = calculate_monthly_interest(deposit_per_period, annual_yield, initial_balance)
     st.write(f"Estimated balance by the end of the year: ${final_balance:.2f}")
-    
-    # Get the current month and year
-    current_month = datetime.now().month
-    current_year = datetime.now().year
-    
-    st.write("Monthly interest earnings:")
-    bullet_points = ""
+
+    # Adjust the script to correctly handle December and the year wrap-around
+    current_date = datetime.now()
+    monthly_display = ""
     for i, interest in enumerate(monthly_interest_earnings, start=1):
-        # Calculate month name
-        month_name = calendar.month_name[(current_month + i - 1) % 12 or 12]  # Correct for zero-index and loop around
+        # Increment month correctly, including handling December to January transition
+        future_date = (current_date + timedelta(days=i*30))
+        month_name = calendar.month_name[future_date.month]
+        year = future_date.year
         # Append each month's interest earnings as bullet points
-        bullet_points += f"* {month_name}: ${interest:.2f}\n"
+        monthly_display += f"* {month_name} {year}: ${interest:.2f}\n"
     # Display bullet points using Markdown
-    st.markdown(bullet_points)
+    st.markdown(monthly_display)
